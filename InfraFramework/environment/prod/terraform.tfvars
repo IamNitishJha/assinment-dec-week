@@ -7,7 +7,7 @@ vnets = {
     subnet_name             = "subnet-production"
     subnet_address_prefixes = ["10.0.1.0/24"]
   }
-  vnet2 = {
+vnet2 = {
     vent_name               = "vnet-development"
     address_space           = ["10.1.0.0/16"]
     location                = "East US"
@@ -16,5 +16,6 @@ vnets = {
     subnet_address_prefixes = ["10.1.1.0/24"]
   }
 }
+
 
 
