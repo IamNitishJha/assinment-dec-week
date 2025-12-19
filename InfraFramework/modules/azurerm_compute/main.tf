@@ -39,7 +39,7 @@ resource "azurerm_network_interface" "nic" {
   resource_group_name = each.value.rg_name
 
   ip_configuration {
-    name                          = "testconfiguration1"
+    name                          = "testipconfiguration1"
     subnet_id                     = data.azurerm_subnet.snet[each.key].id
     public_ip_address_id          = data.azurerm_public_ip.pip[each.key].id
     private_ip_address_allocation = "Dynamic"
@@ -68,5 +68,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     storage_account_type = each.value.os_disk_storage_account_type
   }
 }
+
 
 
