@@ -9,7 +9,10 @@ variable "vnets" {
   }))
 }
 
+
+
 module "vnet" {
   source = "../../modules/azurerm_virtual_network"
   vnets  = var.vnets
 }
+
