@@ -1,0 +1,126 @@
+trigger: none
+
+pool:
+  name: My Agent
+
+stages:
+
+# ================================
+#        BUILD STAGE
+# ================================
+- stage: Build
+  displayName: "Build"
+  jobs:
+  - job: BuildJob
+    displayName: "Terraform Init & Validate"
+    steps:
+
+    - task: TerraformTask@5
+      inputs:
+       provider: 'azurerm'
+       command: 'custom'
+       workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
+       outputTo: 'console'
+       customCommand: '-reconfigure'
+       environmentServiceNameAzureRM: 'ado-service-connection'
+       
+    - task: TerraformTask@5
+      displayName: "Terraform Init"
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
+        backendServiceArm: 'ado-service-connection'
+        backendAzureRmResourceGroupName: 'ram-rg'
+        backendAzureRmStorageAccountName: 'ramstgacc1'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'raj.terraform.tfstate'
+
+    - task: TerraformTask@5
+      displayName: "Terraform Validate"
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
+        environmentServiceNameAzureRM: 'ado-service-connection'
+
+
+
+# ================================
+#        SCAN STAGE
+# ================================
+- stage: Scan
+  displayName: "Security Scan"
+  dependsOn: Build
+  jobs:
+  - job: ScanJob
+    displayName: "Run tfsec & tflint"
+    steps:
+
+    # -------------------------
+    # Install tfsec
+    # -------------------------
+    - powershell: |
+        $tfsecPath = "C:\Tools\tfsec"
+        New-Item -ItemType Directory -Path $tfsecPath -Force | Out-Null
+        Invoke-WebRequest `
+          -Uri "https://github.com/aquasecurity/tfsec/releases/latest/download/tfsec-windows-amd64.exe" `
+          -OutFile "$tfsecPath\tfsec.exe"
+      displayName: "Install tfsec"
+
+    # Run tfsec
+    - powershell: |
+        $ENV:PATH += ";C:\Tools\tfsec"
+        & "C:\Tools\tfsec\tfsec.exe" "$(System.DefaultWorkingDirectory)/environment/prod"
+      displayName: "Run tfsec Security Scan"
+
+    # -------------------------
+    # Install tflint
+    # -------------------------
+    - powershell: |
+        $tflintPath = "C:\Tools\tflint"
+        New-Item -ItemType Directory -Path $tflintPath -Force | Out-Null
+
+        Invoke-WebRequest `
+          -Uri "https://github.com/terraform-linters/tflint/releases/latest/download/tflint_windows_amd64.zip" `
+          -OutFile "$tflintPath\tflint.zip"
+
+        Expand-Archive "$tflintPath\tflint.zip" -DestinationPath $tflintPath -Force
+      displayName: "Install tflint"
+
+    # Run tflint (new syntax)
+    - powershell: |
+        $ENV:PATH += ";C:\Tools\tflint"
+        tflint --version
+        tflint --chdir "$(System.DefaultWorkingDirectory)/environment/prod"
+      displayName: "Run tflint Code Linting"
+
+
+
+# ================================
+#        DEPLOY STAGE
+# ================================
+- stage: Deploy
+  displayName: "Deploy"
+  dependsOn: Scan
+  jobs:
+  - job: DeployJob
+    displayName: "Terraform Plan & Apply"
+    steps:
+
+    - task: TerraformTask@5
+      displayName: "Terraform Plan"
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
+        environmentServiceNameAzureRM: 'ado-service-connection'
+
+    - task: TerraformTask@5
+      displayName: "Terraform Apply"
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        commandOptions: '-auto-approve'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
+        environmentServiceNameAzureRM: 'ado-service-connection'
