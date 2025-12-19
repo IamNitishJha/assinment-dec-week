@@ -15,11 +15,12 @@ resource_groups = {
     managed_by  = "DevOps Team"
     environment = "Stage"
     tags = {
-      Project = "Todo Micro App"
-      Owner   = "Har Har Mahadev"
+      Project = "TodoMicro App"
+      Owner   = "myself"
     }
   }
 }
+
 
 
 
