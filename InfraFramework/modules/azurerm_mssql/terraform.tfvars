@@ -5,7 +5,7 @@ sql_servers = {
     server_name  = "infrasqlserver1"
     version      = "12.0"
     admin_login  = "sqladminuser1"
-    admin_password = "P@ssword1234!"
+    admin_password = "P@ssword1890"
     server_id    = "infrasqlserver1"
     collation    = "SQL_Latin1_General_CP1_CI_AS"   
     license_type = "LicenseIncluded"
@@ -21,7 +21,7 @@ sql_servers = {
     server_name  = "infrasqlserver2"
     version      = "12.0"
     admin_login  = "sqladminuser2"
-    admin_password = "P@ssword5678!"
+    admin_password = "P@ssword1980"
     server_id    = "infrasqlserver2"
     collation    = "SQL_Latin1_General_CP1_CI_AS"
     license_type = "LicenseIncluded"
@@ -33,3 +33,4 @@ sql_servers = {
 }
 
    
+
