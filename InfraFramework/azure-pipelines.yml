@@ -15,7 +15,7 @@ stages:
     displayName: "Terraform Init & Validate"
     steps:
 
-    - task: TerraformTask@5
+    - task: TerraformTask@8
       inputs:
        provider: 'azurerm'
        command: 'custom'
@@ -24,19 +24,19 @@ stages:
        customCommand: '-reconfigure'
        environmentServiceNameAzureRM: 'ado-service-connection'
        
-    - task: TerraformTask@5
+    - task: TerraformTask@8
       displayName: "Terraform Init"
       inputs:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
         backendServiceArm: 'ado-service-connection'
-        backendAzureRmResourceGroupName: 'ram-rg'
-        backendAzureRmStorageAccountName: 'ramstgacc1'
+        backendAzureRmResourceGroupName: 'nitishjha'
+        backendAzureRmStorageAccountName: 'nitishjhasggg'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'raj.terraform.tfstate'
+        backendAzureRmKey: 'nitish.terraform.tfstate'
 
-    - task: TerraformTask@5
+    - task: TerraformTask@8
       displayName: "Terraform Validate"
       inputs:
         provider: 'azurerm'
@@ -108,7 +108,7 @@ stages:
     displayName: "Terraform Plan & Apply"
     steps:
 
-    - task: TerraformTask@5
+    - task: TerraformTask@8
       displayName: "Terraform Plan"
       inputs:
         provider: 'azurerm'
@@ -116,7 +116,7 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
         environmentServiceNameAzureRM: 'ado-service-connection'
 
-    - task: TerraformTask@5
+    - task: TerraformTask@8
       displayName: "Terraform Apply"
       inputs:
         provider: 'azurerm'
@@ -124,3 +124,4 @@ stages:
         commandOptions: '-auto-approve'
         workingDirectory: '$(System.DefaultWorkingDirectory)/environment/prod'
         environmentServiceNameAzureRM: 'ado-service-connection'
+
